@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -47,7 +48,12 @@ func (c *Service) SendEvent(identity string, evtName string, evtData map[string]
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return errors.New("non 200 response")
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(resp.Body)
+		body := buf.String()
+
+		err := fmt.Errorf("non 200 response - %s", body)
+		return err
 	}
 
 	return nil
